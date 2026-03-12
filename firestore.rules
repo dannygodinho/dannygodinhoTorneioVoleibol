@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: registrations
+    // Document ID: auto-generated
+    // Fields:
+    //   - name: string (required)
+    //   - email: string (required, email format)
+    //   - phone: string (optional)
+    //   - teamName: string (optional)
+    //   - players: list (required, max 8 objects {name, studentNumber})
+    //   - createdAt: timestamp (required)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isValidPlayer(player) {
+      return player is map && 
+             player.name is string && player.name.size() > 0 &&
+             player.studentNumber is string && player.studentNumber.size() > 0;
+    }
+
+    function isValidRegistration(data) {
+      return data.keys().hasAll(['name', 'email', 'players', 'createdAt']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             data.players is list && data.players.size() <= 8 &&
+             data.players.all(p, isValidPlayer(p)) &&
+             data.createdAt is timestamp;
+    }
+
+    match /registrations/{registrationId} {
+      // Allow anyone to register (create)
+      allow create: if isValidRegistration(request.resource.data);
+      
+      // Allow authenticated users to see registrations (for admin/dashboard purposes)
+      // In a real app, we might restrict this further to admins only.
+      allow read: if isAuthenticated();
+      
+      // Restrict updates/deletes to authenticated users (admins)
+      allow update, delete: if isAuthenticated();
+    }
+  }
+}

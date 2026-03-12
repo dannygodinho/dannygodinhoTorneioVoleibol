@@ -1,0 +1,5 @@
+{
+  "name": "Torneio Voleibol 6X6",
+  "description": "Plataforma para inscrição em torneios desportivos com gestão de base de dados em tempo real.",
+  "requestFramePermissions": []
+}

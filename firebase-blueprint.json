@@ -1,0 +1,52 @@
+{
+  "entities": {
+    "Registration": {
+      "title": "Registration",
+      "description": "A tournament registration entry.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the team representative."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address of the participant."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact phone number."
+        },
+        "teamName": {
+          "type": "string",
+          "description": "Name of the team (optional)."
+        },
+        "players": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "studentNumber": { "type": "string" }
+            },
+            "required": ["name", "studentNumber"]
+          },
+          "description": "List of players with name and student number (up to 8)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the registration was created."
+        }
+      },
+      "required": ["name", "email", "players", "createdAt"]
+    }
+  },
+  "firestore": {
+    "registrations": {
+      "schema": "Registration",
+      "description": "Collection of tournament registrations."
+    }
+  }
+}
